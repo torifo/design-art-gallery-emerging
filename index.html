@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HALF — Works by people we know.</title>
+  <meta name="description" content="HALF is an emerging gallery for the half-formed, the half-finished, the half-honest. Fictional gallery for design research.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #F4F0E6;
+      --bg-sub: #ECE7D8;
+      --bg-stamp: #1A1A1A;
+      --fg: #161410;
+      --fg-muted: #6B6555;
+      --fg-light: #A8A092;
+      --border: #1A1A1A;
+      --accent: #D7FF3A;
+      --accent-2: #FF5C8A;
+      --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+      --font-serif: 'Times New Roman', Times, serif;
+      --font-sans: 'Inter', sans-serif;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --ease-snap: cubic-bezier(0.7, 0, 0.3, 1);
+    }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-serif);
+      font-size: 17px;
+      line-height: 1.5;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    /* Paper noise overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -10%;
+      pointer-events: none;
+      z-index: 9000;
+      opacity: 0.06;
+      mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    button, input { font: inherit; color: inherit; }
+
+    /* Loader — brand jolt landing */
+    .loader {
+      position: fixed; inset: 0; z-index: 10000;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+    }
+    .loader.gone { opacity: 0; transition: opacity .35s .1s; }
+    .loader.hidden { display: none; }
+    .loader-brand {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: clamp(4rem, 14vw, 11rem);
+      letter-spacing: -.02em;
+      display: inline-flex;
+    }
+    .loader-brand span {
+      display: inline-block;
+      animation: jolt .6s var(--ease-snap) forwards;
+    }
+    .loader-brand span:nth-child(1) { animation-delay: .05s; transform: translateY(-30px) rotate(-8deg); }
+    .loader-brand span:nth-child(2) { animation-delay: .18s; transform: translateY(28px) rotate(6deg); }
+    .loader-brand span:nth-child(3) { animation-delay: .12s; transform: translateY(-14px) rotate(-3deg); }
+    .loader-brand span:nth-child(4) { animation-delay: .26s; transform: translateY(18px) rotate(4deg); }
+    @keyframes jolt {
+      0%   { opacity: 0; }
+      60%  { opacity: 1; transform: translateY(2px) rotate(.5deg); }
+      80%  { transform: translateY(-1px) rotate(-.4deg); }
+      100% { opacity: 1; transform: translateY(0) rotate(0); }
+    }
+
+    /* Punchholes — decorative */
+    .punchholes {
+      position: absolute; top: 18px; left: 0; right: 0;
+      pointer-events: none; z-index: 5;
+      display: flex; justify-content: space-between;
+      padding: 0 6vw;
+    }
+    .punchholes span {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--bg-sub);
+      box-shadow: inset 0 2px 3px rgba(0,0,0,.35), 0 0 0 1px rgba(0,0,0,.18);
+    }
+
+    /* Nav — torn paper bottom */
+    nav.site-nav {
+      position: relative;
+      padding: 2.6rem clamp(1.1rem, 5vw, 3.2rem) 1.4rem;
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 1rem; flex-wrap: wrap;
+      background: var(--bg);
+    }
+    nav.site-nav::after {
+      content: "";
+      position: absolute; left: 0; right: 0; bottom: -10px; height: 14px;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 14' preserveAspectRatio='none'><path d='M0 4 L40 2 L75 7 L120 1 L170 6 L220 3 L270 8 L320 2 L380 5 L440 1 L500 6 L560 3 L620 7 L680 2 L740 5 L800 1 L860 6 L920 3 L980 7 L1040 2 L1100 5 L1160 3 L1200 6 L1200 14 L0 14 Z' fill='%231A1A1A'/></svg>");
+      background-size: 100% 100%;
+    }
+    .brand {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: clamp(2.4rem, 6vw, 3.4rem);
+      letter-spacing: -.02em;
+      line-height: 1;
+      display: inline-block;
+      transform: rotate(-1.5deg);
+    }
+    .nav-links {
+      display: flex;
+      align-items: baseline;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 500;
+      text-transform: lowercase;
+    }
+    .nav-links a {
+      display: inline-block;
+      padding: .15rem .3rem;
+      border-bottom: 2px solid transparent;
+      transition: border-color .2s var(--ease), background .2s var(--ease);
+    }
+    .nav-links a:hover { border-bottom-color: var(--fg); background: var(--accent); }
+    .nav-links a:nth-child(1) { margin-right: 1.4rem; }
+    .nav-links a:nth-child(2) { margin-right: 2.2rem; }
+    .nav-links a:nth-child(3) { margin-right: 1.1rem; }
+    .nav-links a:nth-child(4) { margin-right: 1.9rem; }
+    .nav-links a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+    /* Hero */
+    .hero {
+      padding: clamp(2.2rem, 6vw, 5rem) clamp(1.1rem, 5vw, 3.2rem) clamp(2rem, 5vw, 4rem);
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: clamp(1.4rem, 4vw, 3rem);
+      align-items: center;
+    }
+    .hero-text h1 {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: clamp(3rem, 9vw, 8.6rem);
+      line-height: .95;
+      letter-spacing: -.03em;
+    }
+    .hero-text h1 .l1 { display: block; transform: translateX(-.4rem); }
+    .hero-text h1 .l2 { display: block; transform: translateX(2.4rem); color: var(--fg); position: relative; }
+    .hero-text h1 .l2::after {
+      content: ""; position: absolute; left: -.2rem; right: -.4rem; bottom: .12em; height: .42em;
+      background: var(--accent); z-index: -1; transform: skewX(-6deg);
+    }
+    .hero-text h1 .l3 { display: block; transform: translateX(.9rem); }
+    .hero-meta {
+      margin-top: 1.6rem;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      display: inline-flex; align-items: center; gap: .6rem; flex-wrap: wrap;
+      border-top: 1.5px solid var(--border);
+      padding-top: .9rem;
+    }
+    .hero-meta b { color: var(--fg); font-weight: 600; }
+    .hero-meta .dot { width: 8px; height: 8px; background: var(--accent-2); border-radius: 50%; display: inline-block; }
+
+    .hero-snap {
+      position: relative;
+      justify-self: center;
+      background: #fff;
+      padding: 14px 14px 56px;
+      border: 1.5px solid var(--border);
+      box-shadow: 6px 7px 0 var(--fg);
+      transform: rotate(-3deg);
+      max-width: 360px;
+      width: 100%;
+    }
+    .hero-snap-img { aspect-ratio: 4/5; overflow: hidden; background: var(--bg-sub); }
+    .hero-snap-img img { filter: contrast(1.04) saturate(.95); }
+    .hero-snap-cap {
+      position: absolute; left: 16px; right: 16px; bottom: 14px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--fg);
+    }
+    .tape {
+      position: absolute;
+      background: rgba(215,255,58,.7);
+      width: 90px; height: 22px;
+      border: 1.5px solid rgba(0,0,0,.15);
+      mix-blend-mode: multiply;
+    }
+    .hero-snap .tape-1 { top: -12px; left: -10px; transform: rotate(-14deg); }
+    .hero-snap .tape-2 { bottom: -8px; right: -6px; width: 70px; height: 18px; transform: rotate(8deg); background: rgba(255,92,138,.55); }
+
+    /* Marquee */
+    .marquee {
+      border-top: 2px solid var(--border);
+      border-bottom: 2px solid var(--border);
+      background: var(--bg-sub);
+      overflow: hidden;
+      padding: .8rem 0;
+      font-family: var(--font-mono);
+      font-size: clamp(1rem, 2.4vw, 1.6rem);
+      white-space: nowrap;
+    }
+    .marquee-track {
+      display: inline-block;
+      animation: scroll 60s linear infinite;
+      padding-left: 100%;
+    }
+    .marquee-track span { margin-right: 3rem; }
+    .marquee-track .ast { color: var(--accent-2); }
+    @keyframes scroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* Sections */
+    .section {
+      padding: clamp(3.4rem, 7vw, 6rem) clamp(1.1rem, 5vw, 3.2rem);
+      border-bottom: 2px solid var(--border);
+      position: relative;
+    }
+    .section-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 1rem; flex-wrap: wrap;
+      margin-bottom: 2.4rem;
+    }
+    .section-head h2 {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      letter-spacing: -.02em;
+      line-height: 1;
+    }
+    .section-head .tag {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      padding: .3rem .55rem;
+      border: 1.5px solid var(--border);
+      transform: rotate(2deg);
+      background: var(--bg);
+    }
+
+    /* Works masonry */
+    .works {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.2rem 1.4rem;
+      align-items: start;
+    }
+    .work {
+      position: relative;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      padding: 10px 10px 14px;
+      box-shadow: 5px 6px 0 var(--fg);
+      transition: transform .35s var(--ease-snap), box-shadow .35s var(--ease-snap);
+    }
+    .work:hover { transform: rotate(0) translateY(-3px) !important; box-shadow: 7px 9px 0 var(--fg); }
+    .work .img { aspect-ratio: 4/5; overflow: hidden; background: var(--bg-sub); }
+    .work .img img { transition: transform .6s var(--ease); }
+    .work:hover .img img { transform: scale(1.03); }
+    .work-info {
+      padding: .55rem .15rem 0;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      display: flex; justify-content: space-between; gap: .5rem;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+    }
+    .work-title { color: var(--fg); }
+    .price {
+      position: absolute;
+      bottom: 16px; right: -10px;
+      background: var(--bg-stamp);
+      color: #fff;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 13px;
+      padding: .35rem .55rem;
+      letter-spacing: .02em;
+      transform: rotate(2deg);
+      box-shadow: 2px 2px 0 rgba(0,0,0,.18);
+    }
+    .price.nfs { background: var(--accent-2); color: #1A1A1A; }
+    .work .tape-c {
+      position: absolute;
+      top: -10px; left: 22px;
+      width: 70px; height: 18px;
+      background: rgba(215,255,58,.65);
+      border: 1.5px solid rgba(0,0,0,.15);
+      transform: rotate(-12deg);
+      mix-blend-mode: multiply;
+    }
+    .work:nth-child(1) { grid-column: 1 / span 4; transform: rotate(-1.5deg); margin-top: .8rem; }
+    .work:nth-child(2) { grid-column: 5 / span 5; transform: rotate(1.4deg); margin-top: 3.2rem; }
+    .work:nth-child(3) { grid-column: 10 / span 3; transform: rotate(-2deg); }
+    .work:nth-child(4) { grid-column: 2 / span 4; transform: rotate(2deg); margin-top: 1.6rem; }
+    .work:nth-child(5) { grid-column: 7 / span 4; transform: rotate(-1.2deg); margin-top: .4rem; }
+    .work:nth-child(6) { grid-column: 4 / span 5; transform: rotate(1.8deg); margin-top: 2rem; }
+
+    /* Artist intro */
+    .artist {
+      display: grid;
+      grid-template-columns: .7fr 1.3fr;
+      gap: clamp(1.6rem, 5vw, 4rem);
+      align-items: flex-start;
+    }
+    .polaroid {
+      background: #fff;
+      padding: 14px 14px 56px;
+      border: 1.5px solid var(--border);
+      box-shadow: 5px 6px 0 var(--fg);
+      transform: rotate(-2deg);
+      max-width: 340px;
+      width: 100%;
+      position: relative;
+    }
+    .polaroid .img { aspect-ratio: 4/5; overflow: hidden; background: var(--bg-sub); }
+    .polaroid-cap {
+      position: absolute; left: 18px; bottom: 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+    .polaroid .tape-c {
+      position: absolute; top: -12px; right: -8px;
+      width: 80px; height: 20px;
+      background: rgba(255,92,138,.55);
+      border: 1.5px solid rgba(0,0,0,.15);
+      transform: rotate(10deg);
+      mix-blend-mode: multiply;
+    }
+    .artist-letter {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--fg);
+      max-width: 36rem;
+      white-space: pre-line;
+      background: var(--bg-sub);
+      padding: 1.4rem 1.6rem;
+      border: 1.5px solid var(--border);
+      transform: rotate(.4deg);
+      position: relative;
+    }
+    .artist-letter::before {
+      content: "TYPED ON A WHIRLPOOL";
+      position: absolute; top: -10px; left: 14px;
+      background: var(--bg);
+      padding: 0 .4rem;
+      font-size: 11px;
+      color: var(--fg-muted);
+      letter-spacing: .08em;
+    }
+    .artist-letter b { background: var(--accent); padding: 0 .15em; }
+
+    /* About — letter */
+    .about-letter {
+      max-width: 38rem;
+      margin: 0 auto;
+      background: #fff;
+      padding: 2.2rem 2rem 2rem;
+      border: 1.5px solid var(--border);
+      box-shadow: 6px 7px 0 var(--fg);
+      transform: rotate(-.6deg);
+      position: relative;
+    }
+    .about-letter::after {
+      content: "";
+      position: absolute; top: -14px; left: 50%; transform: translateX(-50%) rotate(-4deg);
+      width: 120px; height: 24px;
+      background: rgba(255,92,138,.55);
+      border: 1.5px solid rgba(0,0,0,.15);
+      mix-blend-mode: multiply;
+    }
+    .about-letter h3 {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: .02em;
+    }
+    .about-letter p {
+      font-family: var(--font-serif);
+      font-size: 17px;
+      line-height: 1.55;
+      margin-bottom: 1rem;
+    }
+    .about-letter p:last-of-type { margin-bottom: 1.4rem; }
+    .signature {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 1.5rem;
+      color: var(--fg);
+      transform: rotate(-3deg);
+      display: inline-block;
+      border-bottom: 2px solid var(--fg);
+      padding-bottom: .15rem;
+    }
+    .signed-by {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      margin-top: .4rem;
+    }
+
+    /* Events — tickets */
+    .events {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.4rem;
+    }
+    .ticket {
+      position: relative;
+      background: var(--bg-sub);
+      border: 1.5px solid var(--border);
+      padding: 1.2rem 1.2rem 1rem;
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 1rem;
+      align-items: flex-start;
+      box-shadow: 4px 5px 0 var(--fg);
+      transition: transform .25s var(--ease-snap);
+    }
+    .ticket:nth-child(1) { transform: rotate(-.8deg); }
+    .ticket:nth-child(2) { transform: rotate(.6deg); }
+    .ticket:nth-child(3) { transform: rotate(-.3deg); }
+    .ticket:hover { transform: rotate(0) translateY(-2px); }
+    .ticket::before {
+      content: ""; position: absolute; top: 50%; left: 88px; transform: translateY(-50%);
+      width: 1.5px; height: 80%;
+      background-image: linear-gradient(var(--border) 50%, transparent 50%);
+      background-size: 1.5px 7px;
+    }
+    .stamp-date {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      text-align: center;
+      border: 1.5px solid var(--border);
+      padding: .35rem .2rem;
+      background: var(--bg);
+      transform: rotate(-2deg);
+    }
+    .stamp-date .m { font-size: 11px; text-transform: uppercase; color: var(--accent-2); letter-spacing: .06em; }
+    .stamp-date .d { font-size: 1.7rem; line-height: 1; color: var(--fg); }
+    .stamp-date .y { font-size: 10px; color: var(--fg-muted); letter-spacing: .04em; }
+    .ev-body h4 {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 1rem;
+      line-height: 1.2;
+      margin-bottom: .35rem;
+    }
+    .ev-body p {
+      font-family: var(--font-serif);
+      font-size: 14px;
+      line-height: 1.45;
+      color: var(--fg-muted);
+    }
+    .ev-body .where {
+      display: inline-block;
+      margin-top: .5rem;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--fg);
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 1px;
+    }
+
+    /* Open Call sticky */
+    .sticky-cta {
+      position: fixed;
+      bottom: 26px; right: 20px;
+      z-index: 800;
+      background: var(--accent);
+      border: 1.5px solid var(--border);
+      padding: .9rem 1rem;
+      width: 180px;
+      transform: rotate(4deg);
+      box-shadow: 5px 6px 0 var(--fg);
+      font-family: var(--font-mono);
+      transition: transform .25s var(--ease-snap);
+    }
+    .sticky-cta:hover { transform: rotate(0) translateY(-2px); }
+    .sticky-cta::before {
+      content: ""; position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-6deg);
+      width: 60px; height: 16px;
+      background: rgba(255,255,255,.55);
+      border: 1.5px solid rgba(0,0,0,.18);
+      mix-blend-mode: multiply;
+    }
+    .sticky-cta .label {
+      font-size: 10px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      margin-bottom: .25rem;
+    }
+    .sticky-cta .title {
+      font-weight: 600;
+      font-size: 15px;
+      line-height: 1.15;
+      margin-bottom: .45rem;
+    }
+    .sticky-cta .arrow {
+      display: inline-block;
+      font-size: 12px;
+      border-bottom: 2px solid var(--fg);
+      padding-bottom: 1px;
+    }
+
+    /* Submit form */
+    .submit-block {
+      background: var(--bg-sub);
+      border: 2px solid var(--border);
+      padding: 2rem 1.6rem;
+      max-width: 540px;
+    }
+    .submit-block h3 {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 1.3rem;
+      margin-bottom: .4rem;
+    }
+    .submit-block p {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--fg-muted);
+      margin-bottom: 1.1rem;
+    }
+    .submit-row {
+      display: flex; gap: .6rem;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: .25rem;
+    }
+    .submit-row input {
+      flex: 1;
+      border: 0;
+      background: transparent;
+      padding: .6rem 0;
+      outline: 0;
+      font-family: var(--font-mono);
+      font-size: 14px;
+    }
+    .submit-row button {
+      border: 0;
+      background: var(--fg);
+      color: var(--bg);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 13px;
+      padding: .55rem .9rem;
+      cursor: pointer;
+      letter-spacing: .04em;
+    }
+    .submit-row button:hover { background: var(--accent-2); color: var(--fg); }
+
+    /* Footer */
+    footer {
+      padding: 3rem clamp(1.1rem, 5vw, 3.2rem) 2rem;
+      background: var(--bg-sub);
+      border-top: 2px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--fg-muted);
+    }
+    .foot-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 1.6rem;
+      margin-bottom: 2rem;
+    }
+    .foot-grid h5 {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--fg);
+      margin-bottom: .55rem;
+    }
+    .foot-grid p, .foot-grid a { line-height: 1.55; display: block; }
+    .foot-grid a:hover { background: var(--accent); color: var(--fg); }
+    .foot-brand {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 2rem;
+      color: var(--fg);
+      transform: rotate(-1.5deg);
+      display: inline-block;
+      line-height: 1;
+      margin-bottom: .6rem;
+    }
+    .disclaim {
+      border-top: 1.5px solid var(--border);
+      padding-top: 1rem;
+      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    /* Reveal */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .55s var(--ease-snap), transform .55s var(--ease-snap); }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    .work.reveal.in:nth-child(1) { transform: rotate(-1.5deg); }
+    .work.reveal.in:nth-child(2) { transform: rotate(1.4deg); }
+    .work.reveal.in:nth-child(3) { transform: rotate(-2deg); }
+    .work.reveal.in:nth-child(4) { transform: rotate(2deg); }
+    .work.reveal.in:nth-child(5) { transform: rotate(-1.2deg); }
+    .work.reveal.in:nth-child(6) { transform: rotate(1.8deg); }
+
+    /* Focus */
+    a:focus-visible, button:focus-visible, input:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Mobile */
+    @media (max-width: 760px) {
+      body { font-size: 16px; }
+      .punchholes { padding: 0 8vw; }
+      nav.site-nav { padding-top: 2rem; }
+      .nav-links { width: 100%; flex-wrap: wrap; gap: .8rem; }
+      .nav-links a { margin-right: 0 !important; }
+      .nav-links a:nth-child(n+4) { display: none; }
+      .brand { transform: rotate(-.5deg); }
+      .hero { grid-template-columns: 1fr; gap: 2rem; }
+      .hero-text h1 .l1, .hero-text h1 .l2, .hero-text h1 .l3 { transform: translateX(0); }
+      .hero-snap { transform: rotate(-1deg); max-width: 280px; }
+      .works { grid-template-columns: 1fr; gap: 2rem; }
+      .work:nth-child(n) { grid-column: 1 / -1; margin-top: 0; transform: rotate(-.5deg); }
+      .work:nth-child(even) { transform: rotate(.5deg); }
+      .work.reveal.in:nth-child(n) { transform: rotate(-.5deg); }
+      .work.reveal.in:nth-child(even) { transform: rotate(.5deg); }
+      .artist { grid-template-columns: 1fr; }
+      .polaroid { transform: rotate(-.8deg); margin: 0 auto; }
+      .artist-letter { transform: rotate(0); font-size: 13px; }
+      .events { grid-template-columns: 1fr; }
+      .ticket:nth-child(n) { transform: rotate(-.3deg); }
+      .about-letter { transform: rotate(0); padding: 1.6rem 1.3rem; }
+      .signature { transform: rotate(-1.5deg); font-size: 1.3rem; }
+      .sticky-cta { width: 130px; padding: .65rem .75rem; bottom: 14px; right: 12px; transform: rotate(2deg); }
+      .sticky-cta .title { font-size: 13px; }
+      .foot-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .work, .work:nth-child(n), .ticket:nth-child(n), .polaroid, .hero-snap, .brand, .about-letter, .sticky-cta, .signature, .artist-letter, .hero-text h1 .l1, .hero-text h1 .l2, .hero-text h1 .l3 { transform: none !important; }
+      .marquee-track { animation: none; }
+      .loader-brand span { animation: none; transform: none; opacity: 1; }
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="loader" id="loader" aria-hidden="true">
+    <span class="loader-brand"><span>H</span><span>A</span><span>L</span><span>F</span></span>
+  </div>
+
+  <div class="punchholes" aria-hidden="true"><span></span><span></span></div>
+
+  <nav class="site-nav">
+    <a class="brand" href="#">HALF</a>
+    <div class="nav-links">
+      <a href="#works">works</a>
+      <a href="#artists">artists</a>
+      <a href="#about">about</a>
+      <a href="#events">events</a>
+      <a href="#submit">submit</a>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div class="hero-text">
+        <h1>
+          <span class="l1">WORKS BY</span>
+          <span class="l2">PEOPLE</span>
+          <span class="l3">WE KNOW.</span>
+        </h1>
+        <p class="hero-meta">
+          <span class="dot"></span>
+          <span>CURRENT SHOW</span>
+          <b>— half-formed III —</b>
+          <span>MAY 12 ▸ JUN 30</span>
+        </p>
+      </div>
+      <div class="hero-snap" aria-hidden="false">
+        <span class="tape tape-1"></span>
+        <span class="tape tape-2"></span>
+        <div class="hero-snap-img">
+          <img src="https://images.unsplash.com/photo-1531913764164-f85c52e6e654?auto=format&fit=crop&w=720&q=70" alt="Snapshot of the gallery space, taken on a phone">
+        </div>
+        <p class="hero-snap-cap">opening night, may 12 — 3rd floor</p>
+      </div>
+    </section>
+
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>HALF-FORMED III</span><span class="ast">★</span>
+        <span>MEI ISHIDA</span><span>T. BRENT</span><span>lo_kappa</span>
+        <span class="ast">★</span><span>BENICIA MARR</span>
+        <span>the show is up until June 30 and then we'll see, the th</span>
+        <span class="ast">★</span>
+        <span>HALF-FORMED III</span><span class="ast">★</span>
+        <span>MEI ISHIDA</span><span>T. BRENT</span><span>lo_kappa</span>
+      </div>
+    </div>
+
+    <section class="section" id="works">
+      <div class="section-head">
+        <h2>WORKS<br>ON VIEW.</h2>
+        <span class="tag">DM to buy ↘</span>
+      </div>
+      <div class="works">
+        <article class="work reveal">
+          <span class="tape-c" aria-hidden="true"></span>
+          <div class="img"><img src="https://images.unsplash.com/photo-1549289524-06cf8837ace5?auto=format&fit=crop&w=620&q=70" alt="Untitled (Window), Mei Ishida"></div>
+          <div class="work-info"><span class="work-title">Untitled (Window)</span><span>Mei Ishida</span></div>
+          <span class="price" aria-label="price: 420 USD">$420</span>
+        </article>
+        <article class="work reveal">
+          <div class="img"><img src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=820&q=70" alt="Bedroom Painting #4, T. Brent"></div>
+          <div class="work-info"><span class="work-title">Bedroom Painting #4</span><span>T. Brent</span></div>
+          <span class="price" aria-label="price: 1200 USD">$1.2K</span>
+        </article>
+        <article class="work reveal">
+          <span class="tape-c" aria-hidden="true"></span>
+          <div class="img"><img src="https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?auto=format&fit=crop&w=520&q=70" alt="Half a Lemon, lo_kappa"></div>
+          <div class="work-info"><span class="work-title">Half a Lemon</span><span>lo_kappa</span></div>
+          <span class="price" aria-label="price: 680 USD">$680</span>
+        </article>
+        <article class="work reveal">
+          <div class="img"><img src="https://images.unsplash.com/photo-1547333101-3d62a3afa1e1?auto=format&fit=crop&w=620&q=70" alt="Studio Floor 02, Benicia Marr"></div>
+          <div class="work-info"><span class="work-title">Studio Floor 02</span><span>Benicia Marr</span></div>
+          <span class="price" aria-label="price: 890 USD">$890</span>
+        </article>
+        <article class="work reveal">
+          <span class="tape-c" aria-hidden="true"></span>
+          <div class="img"><img src="https://images.unsplash.com/photo-1578321272125-4e4c4c3643c5?auto=format&fit=crop&w=720&q=70" alt="Mother's Hand, Mei Ishida"></div>
+          <div class="work-info"><span class="work-title">Mother's Hand</span><span>Mei Ishida</span></div>
+          <span class="price nfs" aria-label="not for sale">NFS</span>
+        </article>
+        <article class="work reveal">
+          <div class="img"><img src="https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?auto=format&fit=crop&w=720&q=70" alt="Carpet Triptych, lo_kappa"></div>
+          <div class="work-info"><span class="work-title">Carpet Triptych</span><span>lo_kappa</span></div>
+          <span class="price" aria-label="price: 2400 USD">$2.4K</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="artists">
+      <div class="section-head">
+        <h2>FROM<br>THE ARTIST.</h2>
+        <span class="tag">letter no. 03</span>
+      </div>
+      <div class="artist">
+        <div class="polaroid reveal" aria-hidden="false">
+          <span class="tape-c" aria-hidden="true"></span>
+          <div class="img"><img src="https://images.unsplash.com/photo-1488161628813-04466f872be2?auto=format&fit=crop&w=520&q=70" alt="Mei Ishida portrait, snapshot"></div>
+          <p class="polaroid-cap">mei in her kitchen, march</p>
+        </div>
+        <div class="artist-letter reveal">hi —
+
+i started this series in the apartment i used
+to share with my brother. half of these were
+painted on cardboard from the moving boxes.
+
+i don't know if they are <b>finished</b> exactly.
+they are honest, and i think that is enough
+for the moment.
+
+if you want one,
+just write me. we'll figure it out.
+
+— mei
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <div class="section-head">
+        <h2>WHAT IS<br>HALF?</h2>
+        <span class="tag">a note</span>
+      </div>
+      <div class="about-letter reveal">
+        <h3>Dear visitor,</h3>
+        <p>HALF is a small room on the third floor of a building that used to be a button factory. We open three afternoons a week and on the third Saturday of the month, when there is something to look at.</p>
+        <p>We show people we already know — friends, friends of friends, the person who fixed our window. We don't believe a work has to be finished to be looked at, and we don't believe a price has to be a secret. Everything that can be bought has a number on it. The things that cannot are marked NFS, and we're happy to tell you why over coffee.</p>
+        <p>If any of this sounds like your kind of room, please come in. The buzzer is broken; just push the door.</p>
+        <span class="signature">— Iris &amp; Wren</span>
+        <p class="signed-by">co-directors, half / brooklyn ny</p>
+      </div>
+    </section>
+
+    <section class="section" id="events">
+      <div class="section-head">
+        <h2>UPCOMING.</h2>
+        <span class="tag">free, mostly</span>
+      </div>
+      <div class="events">
+        <article class="ticket reveal">
+          <div class="stamp-date">
+            <div class="m">May</div>
+            <div class="d">24</div>
+            <div class="y">2026</div>
+          </div>
+          <div class="ev-body">
+            <h4>Listening Party:<br>Side B of Nothing</h4>
+            <p>An evening of unfinished tape loops and one (1) bowl of clementines. BYOB.</p>
+            <span class="where">3rd floor · 7:30 PM</span>
+          </div>
+        </article>
+        <article class="ticket reveal">
+          <div class="stamp-date">
+            <div class="m">Jun</div>
+            <div class="d">07</div>
+            <div class="y">2026</div>
+          </div>
+          <div class="ev-body">
+            <h4>Zine Release:<br>HALF Quarterly #3</h4>
+            <p>32 pages, risograph. Mei reads from her studio notes. Pay what you can.</p>
+            <span class="where">3rd floor · 6:00 PM</span>
+          </div>
+        </article>
+        <article class="ticket reveal">
+          <div class="stamp-date">
+            <div class="m">Jun</div>
+            <div class="d">22</div>
+            <div class="y">2026</div>
+          </div>
+          <div class="ev-body">
+            <h4>Walkthrough +<br>Closing Soup</h4>
+            <p>Final walkthrough with the artists, followed by miso and bread. RSVP via DM.</p>
+            <span class="where">3rd floor · 5:00 PM</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="submit">
+      <div class="section-head">
+        <h2>OPEN CALL.</h2>
+        <span class="tag">rolling, no fee</span>
+      </div>
+      <div class="submit-block reveal">
+        <h3>Send us your work.</h3>
+        <p>No portfolio template. No statement required. Just a link, a name, and one sentence about what you're making this week. We answer everyone within a month, even if it's a no.</p>
+        <form class="submit-row" onsubmit="event.preventDefault(); this.querySelector('button').textContent='SENT ✓'; this.querySelector('input').value='';">
+          <input type="text" placeholder="instagram, dropbox, or any link" aria-label="link to your work">
+          <button type="submit">SUBMIT</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <a class="sticky-cta" href="#submit" aria-label="open call: submit your work">
+    <div class="label">★ open call</div>
+    <div class="title">Show with us in fall.</div>
+    <span class="arrow">submit →</span>
+  </a>
+
+  <footer>
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">HALF</div>
+        <p>Third floor, 47 Carroll St<br>Brooklyn, NY 11231</p>
+        <p>thu–sat 1–6 pm<br>or by buzzer</p>
+      </div>
+      <div>
+        <h5>Find us</h5>
+        <a href="#">instagram / @half.gallery</a>
+        <a href="#">are.na / half-gallery</a>
+        <a href="#">substack / halfletter</a>
+      </div>
+      <div>
+        <h5>Write us</h5>
+        <a href="#">hello@half.gallery</a>
+        <a href="#">submit@half.gallery</a>
+        <a href="#">press@half.gallery</a>
+      </div>
+    </div>
+    <div class="disclaim">
+      <span>© 2026 HALF · design study, design-art-gallery-emerging</span>
+      <span>HALF is a fictional gallery created for design research. It does not exist.</span>
+    </div>
+  </footer>
+
+  <script>
+    // Loader: keep brand jolt visible briefly, then fade
+    window.addEventListener('load', () => {
+      const loader = document.getElementById('loader');
+      setTimeout(() => loader.classList.add('gone'), 900);
+      setTimeout(() => loader.classList.add('hidden'), 1400);
+    });
+    // Fallback if 'load' is slow
+    setTimeout(() => {
+      const loader = document.getElementById('loader');
+      if (loader && !loader.classList.contains('hidden')) {
+        loader.classList.add('gone');
+        setTimeout(() => loader.classList.add('hidden'), 500);
+      }
+    }, 2200);
+
+    // Reveal on scroll
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px' });
+    document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  </script>
+</body>
+</html>
